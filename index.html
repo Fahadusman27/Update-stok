@@ -52,6 +52,7 @@
           <p class="text-xs text-slate-400">Pusat riwayat data stok gudang & sales</p>
         </div>
       </div>
+    </div>
   </header>
 
   <!-- ================= MAIN CONTAINER ================= -->
@@ -119,11 +120,11 @@
     <!-- ================= TABEL RIWAYAT UTAMA ================= -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
       
-      <!-- Toolbar Atas: Tab Filter, Search, dan Tombol Refresh -->
+      <!-- Toolbar Atas: Tab Filter, Search, Filter Sales, dan Tombol Refresh -->
       <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         
         <!-- Tab Pilihan: Semua, Stok Gudang, Sales -->
-        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-semibold self-start md:self-auto">
+        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-semibold self-start md:self-auto flex-shrink-0">
           <button 
             type="button" 
             onclick="switchTab('all')" 
@@ -150,13 +151,24 @@
           </button>
         </div>
 
-        <!-- Filter Pencarian & Tombol Segarkan -->
-        <div class="flex items-center gap-2.5">
-          <div class="relative flex-grow sm:w-64">
+        <!-- Filter Sales, Pencarian & Tombol Segarkan -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Filter Dropdown Nama Sales -->
+          <div id="salesFilterContainer" class="relative">
+            <select 
+              id="salesFilter" 
+              onchange="renderDashboardTable()" 
+              class="px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:bg-white focus:border-slate-400 transition cursor-pointer"
+            >
+              <option value="">Semua Sales</option>
+            </select>
+          </div>
+
+          <div class="relative flex-grow sm:w-56">
             <input 
               type="text" 
               id="searchKeyword" 
-              placeholder="Cari riwayat (produk, tanggal)..." 
+              placeholder="Cari (produk, sales, tgl)..." 
               oninput="renderDashboardTable()"
               class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 outline-none transition"
             >
@@ -189,6 +201,7 @@
               <th class="py-3 px-4 w-12 text-center">#</th>
               <th class="py-3 px-4">Tanggal</th>
               <th class="py-3 px-4">Kategori Data</th>
+              <th class="py-3 px-4">Nama Sales / Petugas</th>
               <th class="py-3 px-4">Nama Produk</th>
               <th class="py-3 px-4 text-right">Jumlah</th>
               <th class="py-3 px-4 text-center">Status</th>
@@ -196,7 +209,7 @@
           </thead>
           <tbody id="tableBody" class="divide-y divide-slate-100">
             <tr>
-              <td colspan="6" class="py-12 text-center text-slate-400">
+              <td colspan="7" class="py-12 text-center text-slate-400">
                 <div class="flex flex-col items-center justify-center gap-2">
                   <svg class="animate-spin w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -234,7 +247,7 @@
 
   <!-- ================= JAVASCRIPT ================= -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiLLF70Oa1h0Xwe_UXzzzaq-kSu_TXMeEX4Z8a1dJgECLg3XyInD-HRpL9wPpNS3Qd/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwllBb46iWZxzobEhWjZAMq0gSDVPhG8ykV8JL0AlM1dy95PVVNQ1jaihanQ1Y4xIR/exec";
 
     // State Data Dashboard
     let stokData = [];
@@ -250,6 +263,8 @@
     const statTotalTx = document.getElementById('statTotalTx');
     const tableBody = document.getElementById('tableBody');
     const searchKeyword = document.getElementById('searchKeyword');
+    const salesFilter = document.getElementById('salesFilter');
+    const salesFilterContainer = document.getElementById('salesFilterContainer');
     const footerCountText = document.getElementById('footerCountText');
     const refreshIcon = document.getElementById('refreshIcon');
     const refreshText = document.getElementById('refreshText');
@@ -331,6 +346,26 @@
       } catch (e) {}
     }
 
+    // Perbarui pilihan dropdown filter Sales
+    function updateSalesFilterOptions() {
+      if (!salesFilter) return;
+      const currentVal = salesFilter.value;
+      const uniqueSales = Array.from(new Set(salesData.map(s => (s.namaSales || '').trim()).filter(Boolean))).sort();
+
+      salesFilter.innerHTML = '<option value="">Semua Sales</option>';
+      uniqueSales.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        if (name === currentVal) opt.selected = true;
+        salesFilter.appendChild(opt);
+      });
+
+      if (salesFilterContainer) {
+        salesFilterContainer.style.display = (currentTab === 'stok') ? 'none' : 'block';
+      }
+    }
+
     // Update Statistik Ringkasan
     function updateMetrics() {
       const stokQtyTotal = stokData.reduce((acc, cur) => acc + (Number(cur.jumlahProduk) || 0), 0);
@@ -338,14 +373,18 @@
       const grandTotalPcs = stokQtyTotal + salesQtyTotal;
       const grandTotalTx = stokData.length + salesData.length;
 
+      const uniqueSales = new Set(salesData.map(s => (s.namaSales || '').trim()).filter(Boolean));
+
       statStokPcs.textContent = `${stokQtyTotal.toLocaleString('id-ID')} pcs`;
       statStokTx.textContent = `${stokData.length} pencatatan`;
 
       statSalesPcs.textContent = `${salesQtyTotal.toLocaleString('id-ID')} pcs`;
-      statSalesTx.textContent = `${salesData.length} pencatatan`;
+      statSalesTx.textContent = `${salesData.length} pencatatan${uniqueSales.size > 0 ? ` • ${uniqueSales.size} sales` : ''}`;
 
       statTotalPcs.textContent = `${grandTotalPcs.toLocaleString('id-ID')} pcs`;
       statTotalTx.textContent = `${grandTotalTx} total data`;
+
+      updateSalesFilterOptions();
     }
 
     // Ganti Tab
@@ -358,12 +397,16 @@
       if (activeBtn) {
         activeBtn.className = 'tab-btn px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition';
       }
+      if (salesFilterContainer) {
+        salesFilterContainer.style.display = (tab === 'stok') ? 'none' : 'block';
+      }
       renderDashboardTable();
     }
 
     // Render Tabel Riwayat
     function renderDashboardTable() {
       const keyword = (searchKeyword.value || '').toLowerCase().trim();
+      const selectedSales = (salesFilter ? salesFilter.value : '').toLowerCase().trim();
 
       // Gabungkan data sesuai tab aktif
       let combined = [];
@@ -372,6 +415,7 @@
         stokData.forEach(item => {
           combined.push({
             ...item,
+            namaSales: item.namaSales || 'Gudang (Icang)',
             tipe: 'stok',
             tipeLabel: 'Stok Gudang',
             tipeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -383,6 +427,7 @@
         salesData.forEach(item => {
           combined.push({
             ...item,
+            namaSales: item.namaSales || '-',
             tipe: 'sales',
             tipeLabel: 'Sales',
             tipeColor: 'bg-blue-50 text-blue-700 border-blue-200'
@@ -390,12 +435,17 @@
         });
       }
 
-      // Filter pencarian
+      // Filter pencarian & filter sales
       const filtered = combined.filter(row => {
-        return !keyword || 
-          String(row.namaProduk).toLowerCase().includes(keyword) || 
-          String(row.tanggal).toLowerCase().includes(keyword) ||
-          String(row.tipeLabel).toLowerCase().includes(keyword);
+        const matchKeyword = !keyword || 
+          String(row.namaProduk || '').toLowerCase().includes(keyword) || 
+          String(row.tanggal || '').toLowerCase().includes(keyword) ||
+          String(row.tipeLabel || '').toLowerCase().includes(keyword) ||
+          String(row.namaSales || '').toLowerCase().includes(keyword);
+
+        const matchSales = !selectedSales || (row.tipe === 'sales' && String(row.namaSales || '').toLowerCase() === selectedSales);
+
+        return matchKeyword && matchSales;
       });
 
       footerCountText.textContent = `Menampilkan ${filtered.length} data riwayat`;
@@ -403,7 +453,7 @@
       if (filtered.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="6" class="py-12 text-center text-slate-400">
+            <td colspan="7" class="py-12 text-center text-slate-400">
               <div class="flex flex-col items-center justify-center gap-1.5">
                 <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -419,13 +469,30 @@
       tableBody.innerHTML = filtered.map((row, idx) => `
         <tr class="hover:bg-slate-50/80 transition">
           <td class="py-3 px-4 text-center text-[11px] text-slate-400 font-mono">${idx + 1}</td>
-          <td class="py-3 px-4 text-slate-600 font-mono text-[11px] whitespace-nowrap">${row.tanggal || '-'}</td>
+          <td class="py-3 px-4 text-slate-600 font-mono text-[11px] whitespace-nowrap">${escapeHtml(row.tanggal || '-')}</td>
           <td class="py-3 px-4 whitespace-nowrap">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${row.tipeColor}">
               ${row.tipeLabel}
             </span>
           </td>
-          <td class="py-3 px-4 font-bold text-slate-900">${row.namaProduk}</td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            ${row.tipe === 'sales' ? `
+              <span class="inline-flex items-center gap-1.5 font-bold text-slate-800 bg-blue-50/70 border border-blue-200/60 px-2.5 py-1 rounded-lg text-xs">
+                <svg class="w-3.5 h-3.5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                ${escapeHtml(row.namaSales || '-')}
+              </span>
+            ` : `
+              <span class="inline-flex items-center gap-1.5 font-medium text-slate-600 bg-emerald-50/60 border border-emerald-200/50 px-2.5 py-1 rounded-lg text-xs">
+                <svg class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                Icang (Gudang)
+              </span>
+            `}
+          </td>
+          <td class="py-3 px-4 font-bold text-slate-900">${escapeHtml(row.namaProduk)}</td>
           <td class="py-3 px-4 text-right font-extrabold ${row.tipe === 'stok' ? 'text-emerald-700' : 'text-blue-700'} whitespace-nowrap">
             ${Number(row.jumlahProduk).toLocaleString('id-ID')} pcs
           </td>
@@ -436,6 +503,16 @@
           </td>
         </tr>
       `).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   </script>
 </body>
