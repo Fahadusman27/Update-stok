@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Restok Produk</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-slate-800 selection:text-white pb-16">
+
+  <!-- ================= TOP NAVBAR ================= -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black text-sm shadow-sm">
+          RP
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Dashboard Restok</h1>
+          <p class="text-xs text-slate-400">Pusat riwayat data stok gudang & sales</p>
+        </div>
+      </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-grow">
+    
+    <!-- STATISTIK RINGKASAN KARTU (METRICS) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      
+      <!-- Card 1: Total Riwayat Stok Gudang -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Stok Gudang</span>
+          <span id="statStokPcs" class="text-base sm:text-xl font-extrabold text-slate-900 leading-tight">0 pcs</span>
+          <span id="statStokTx" class="text-[10px] text-slate-400 block mt-0.5">0 pencatatan</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Total Riwayat Sales -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Sales</span>
+          <span id="statSalesPcs" class="text-base sm:text-xl font-extrabold text-slate-900 leading-tight">0 pcs</span>
+          <span id="statSalesTx" class="text-[10px] text-slate-400 block mt-0.5">0 pencatatan</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Total Keseluruhan Item -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Total Volume</span>
+          <span id="statTotalPcs" class="text-base sm:text-xl font-extrabold text-slate-900 leading-tight">0 pcs</span>
+          <span id="statTotalTx" class="text-[10px] text-slate-400 block mt-0.5">Semua data</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Status Database -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Koneksi Database</span>
+          <span class="text-xs sm:text-sm font-bold text-emerald-700 block">Google Sheets</span>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Tersinkronisasi</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TABEL RIWAYAT UTAMA ================= -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      
+      <!-- Toolbar Atas: Tab Filter, Search, dan Tombol Refresh -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        
+        <!-- Tab Pilihan: Semua, Stok Gudang, Sales -->
+        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-semibold self-start md:self-auto">
+          <button 
+            type="button" 
+            onclick="switchTab('all')" 
+            id="tab-all" 
+            class="tab-btn px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition"
+          >
+            Semua Riwayat
+          </button>
+          <button 
+            type="button" 
+            onclick="switchTab('stok')" 
+            id="tab-stok" 
+            class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition"
+          >
+            Stok Gudang
+          </button>
+          <button 
+            type="button" 
+            onclick="switchTab('sales')" 
+            id="tab-sales" 
+            class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition"
+          >
+            Sales
+          </button>
+        </div>
+
+        <!-- Filter Pencarian & Tombol Segarkan -->
+        <div class="flex items-center gap-2.5">
+          <div class="relative flex-grow sm:w-64">
+            <input 
+              type="text" 
+              id="searchKeyword" 
+              placeholder="Cari riwayat (produk, tanggal)..." 
+              oninput="renderDashboardTable()"
+              class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 outline-none transition"
+            >
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <button 
+            type="button" 
+            id="btnRefresh" 
+            onclick="loadDashboardData(true)" 
+            title="Muat data terbaru dari Google Spreadsheet"
+            class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer flex-shrink-0"
+          >
+            <svg id="refreshIcon" class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span id="refreshText">Segarkan</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Tabel Data Riwayat -->
+      <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider sticky top-0 z-10 border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-4 w-12 text-center">#</th>
+              <th class="py-3 px-4">Tanggal</th>
+              <th class="py-3 px-4">Kategori Data</th>
+              <th class="py-3 px-4">Nama Produk</th>
+              <th class="py-3 px-4 text-right">Jumlah</th>
+              <th class="py-3 px-4 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="py-12 text-center text-slate-400">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <svg class="animate-spin w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  </svg>
+                  <span>Memuat data dari Google Spreadsheet...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer Tabel -->
+      <div class="px-5 py-3.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span id="footerCountText">Menampilkan 0 data</span>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Stok Gudang
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Sales
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="py-4 text-center text-xs text-slate-400 bg-white border-t border-slate-200">
+    <p>© 2026 Dashboard Restok Produk • Terintegrasi Google Spreadsheet</p>
+  </footer>
+
+  <!-- ================= JAVASCRIPT ================= -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiLLF70Oa1h0Xwe_UXzzzaq-kSu_TXMeEX4Z8a1dJgECLg3XyInD-HRpL9wPpNS3Qd/exec";
+
+    // State Data Dashboard
+    let stokData = [];
+    let salesData = [];
+    let currentTab = 'all'; // 'all', 'stok', 'sales'
+
+    // DOM Elements
+    const statStokPcs = document.getElementById('statStokPcs');
+    const statStokTx = document.getElementById('statStokTx');
+    const statSalesPcs = document.getElementById('statSalesPcs');
+    const statSalesTx = document.getElementById('statSalesTx');
+    const statTotalPcs = document.getElementById('statTotalPcs');
+    const statTotalTx = document.getElementById('statTotalTx');
+    const tableBody = document.getElementById('tableBody');
+    const searchKeyword = document.getElementById('searchKeyword');
+    const footerCountText = document.getElementById('footerCountText');
+    const refreshIcon = document.getElementById('refreshIcon');
+    const refreshText = document.getElementById('refreshText');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Muat cache lokal dulu agar instan muncul
+      loadLocalCache();
+      renderDashboardTable();
+      updateMetrics();
+
+      // 2. Ambil data terbaru dari server Google Spreadsheet
+      loadDashboardData();
+    });
+
+    // Muat cache dari localStorage
+    function loadLocalCache() {
+      try {
+        stokData = JSON.parse(localStorage.getItem('restok_history_icang') || '[]');
+        salesData = JSON.parse(localStorage.getItem('restok_history_sales') || '[]');
+      } catch (e) {
+        stokData = [];
+        salesData = [];
+      }
+    }
+
+    // Ambil data live dari Google Apps Script (GET action=getDashboard)
+    async function loadDashboardData(isManual = false) {
+      if (isManual) {
+        refreshIcon.classList.add('animate-spin');
+        refreshText.textContent = 'Memuat...';
+      }
+
+      try {
+        // Coba endpoint getDashboard yang mengambil kedua data sekaligus
+        const res = await fetch(`${SCRIPT_URL}?action=getDashboard`);
+        const result = await res.json();
+
+        if (result.status === 'success' && result.data) {
+          if (Array.isArray(result.data.icang)) {
+            stokData = result.data.icang;
+            localStorage.setItem('restok_history_icang', JSON.stringify(stokData));
+          }
+          if (Array.isArray(result.data.sales)) {
+            salesData = result.data.sales;
+            localStorage.setItem('restok_history_sales', JSON.stringify(salesData));
+          }
+        } else {
+          // Fallback: ambil satuan per sheet jika endpoint getDashboard belum dideploy
+          await fetchSingleHistory('Icang');
+          await fetchSingleHistory('Sales');
+        }
+
+      } catch (err) {
+        console.warn('Gagal memuat live data, menggunakan cache:', err);
+      } finally {
+        renderDashboardTable();
+        updateMetrics();
+        if (isManual) {
+          refreshIcon.classList.remove('animate-spin');
+          refreshText.textContent = 'Segarkan';
+        }
+      }
+    }
+
+    // Fallback ambil per sheet
+    async function fetchSingleHistory(penanda) {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getHistory&penanda=${penanda}`);
+        const result = await res.json();
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          if (penanda.toLowerCase() === 'icang') {
+            stokData = result.data;
+            localStorage.setItem('restok_history_icang', JSON.stringify(stokData));
+          } else {
+            salesData = result.data;
+            localStorage.setItem('restok_history_sales', JSON.stringify(salesData));
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Update Statistik Ringkasan
+    function updateMetrics() {
+      const stokQtyTotal = stokData.reduce((acc, cur) => acc + (Number(cur.jumlahProduk) || 0), 0);
+      const salesQtyTotal = salesData.reduce((acc, cur) => acc + (Number(cur.jumlahProduk) || 0), 0);
+      const grandTotalPcs = stokQtyTotal + salesQtyTotal;
+      const grandTotalTx = stokData.length + salesData.length;
+
+      statStokPcs.textContent = `${stokQtyTotal.toLocaleString('id-ID')} pcs`;
+      statStokTx.textContent = `${stokData.length} pencatatan`;
+
+      statSalesPcs.textContent = `${salesQtyTotal.toLocaleString('id-ID')} pcs`;
+      statSalesTx.textContent = `${salesData.length} pencatatan`;
+
+      statTotalPcs.textContent = `${grandTotalPcs.toLocaleString('id-ID')} pcs`;
+      statTotalTx.textContent = `${grandTotalTx} total data`;
+    }
+
+    // Ganti Tab
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition';
+      });
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition';
+      }
+      renderDashboardTable();
+    }
+
+    // Render Tabel Riwayat
+    function renderDashboardTable() {
+      const keyword = (searchKeyword.value || '').toLowerCase().trim();
+
+      // Gabungkan data sesuai tab aktif
+      let combined = [];
+
+      if (currentTab === 'all' || currentTab === 'stok') {
+        stokData.forEach(item => {
+          combined.push({
+            ...item,
+            tipe: 'stok',
+            tipeLabel: 'Stok Gudang',
+            tipeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          });
+        });
+      }
+
+      if (currentTab === 'all' || currentTab === 'sales') {
+        salesData.forEach(item => {
+          combined.push({
+            ...item,
+            tipe: 'sales',
+            tipeLabel: 'Sales',
+            tipeColor: 'bg-blue-50 text-blue-700 border-blue-200'
+          });
+        });
+      }
+
+      // Filter pencarian
+      const filtered = combined.filter(row => {
+        return !keyword || 
+          String(row.namaProduk).toLowerCase().includes(keyword) || 
+          String(row.tanggal).toLowerCase().includes(keyword) ||
+          String(row.tipeLabel).toLowerCase().includes(keyword);
+      });
+
+      footerCountText.textContent = `Menampilkan ${filtered.length} data riwayat`;
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 text-center text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-1.5">
+                <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="text-xs font-medium">Belum ada data riwayat yang tercatat.</span>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = filtered.map((row, idx) => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="py-3 px-4 text-center text-[11px] text-slate-400 font-mono">${idx + 1}</td>
+          <td class="py-3 px-4 text-slate-600 font-mono text-[11px] whitespace-nowrap">${row.tanggal || '-'}</td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${row.tipeColor}">
+              ${row.tipeLabel}
+            </span>
+          </td>
+          <td class="py-3 px-4 font-bold text-slate-900">${row.namaProduk}</td>
+          <td class="py-3 px-4 text-right font-extrabold ${row.tipe === 'stok' ? 'text-emerald-700' : 'text-blue-700'} whitespace-nowrap">
+            ${Number(row.jumlahProduk).toLocaleString('id-ID')} pcs
+          </td>
+          <td class="py-3 px-4 text-center whitespace-nowrap">
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+              ✓ Tercatat
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
