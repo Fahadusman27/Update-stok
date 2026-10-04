@@ -201,7 +201,7 @@
               <th class="py-3 px-4 w-12 text-center">#</th>
               <th class="py-3 px-4">Tanggal</th>
               <th class="py-3 px-4">Kategori Data</th>
-              <th class="py-3 px-4">Nama Sales / Petugas</th>
+              <th class="py-3 px-4">Sales / Lokasi Gudang</th>
               <th class="py-3 px-4">Nama Produk</th>
               <th class="py-3 px-4 text-right">Jumlah</th>
               <th class="py-3 px-4 text-center">Status</th>
@@ -247,7 +247,7 @@
 
   <!-- ================= JAVASCRIPT ================= -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwllBb46iWZxzobEhWjZAMq0gSDVPhG8ykV8JL0AlM1dy95PVVNQ1jaihanQ1Y4xIR/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPJ37XvPfBI3U4_GxvVMYY9hn-PoScgMQOPJyA1c1xgAyDohdrvdRvPDurh4Gco2GD/exec";
 
     // State Data Dashboard
     let stokData = [];
@@ -413,9 +413,15 @@
 
       if (currentTab === 'all' || currentTab === 'stok') {
         stokData.forEach(item => {
+          let labelLokasi = 'Gudang';
+          if (item.namaSales && !item.namaSales.toLowerCase().includes('icang')) {
+            labelLokasi = item.namaSales;
+          } else if (item.lokasi) {
+            labelLokasi = item.lokasi.toLowerCase().startsWith('gudang') ? item.lokasi : `Gudang (${item.lokasi})`;
+          }
           combined.push({
             ...item,
-            namaSales: item.namaSales || 'Gudang (Icang)',
+            namaSales: labelLokasi,
             tipe: 'stok',
             tipeLabel: 'Stok Gudang',
             tipeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -484,11 +490,12 @@
                 ${escapeHtml(row.namaSales || '-')}
               </span>
             ` : `
-              <span class="inline-flex items-center gap-1.5 font-medium text-slate-600 bg-emerald-50/60 border border-emerald-200/50 px-2.5 py-1 rounded-lg text-xs">
+              <span class="inline-flex items-center gap-1.5 font-semibold text-slate-800 bg-emerald-50/70 border border-emerald-200/60 px-2.5 py-1 rounded-lg text-xs">
                 <svg class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Icang (Gudang)
+                ${escapeHtml(row.namaSales || 'Gudang')}
               </span>
             `}
           </td>
